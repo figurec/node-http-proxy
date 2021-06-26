@@ -15,17 +15,12 @@
 PORT = process.env.PORT || 8000;
 
 var http = require('http'),
-    httpProxy = require('http-proxy');
-//
-// Create your proxy server and set the target in the options.
-//
-httpProxy.createProxyServer({target:'http://localhost:9000'}).listen(PORT); // See (†)
+httpProxy = require('http-proxy');
 
-//
-// Create your target server
-//
-http.createServer(function (req, res) {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.write('request successfully proxied!' + '\n' + JSON.stringify(req.headers, true, 2));
-  res.end();
-}).listen(9000);
+var proxy = httpProxy.createProxyServer({});
+
+http.createServer(function(req, res) {
+  proxy.web(req, res, {target:req.url, prependPath:false})
+}).listen(process.env.PORT || 8000);
+
+console.log("Server started on port "+process.env.PORT);
